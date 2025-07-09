@@ -36,6 +36,7 @@ def run(rates: dict, *args, **kwargs):
     val_loader = kwargs.pop('val_loader')
     train_params = kwargs
     for epoch in range(1,kwargs['epoch']+1):
+        logc(f"Epoch {epoch}/{kwargs['epoch']}")
         # 训练阶段
         train_loss, train_dice = train_epoch(train_params)
         # 验证阶段
@@ -44,7 +45,6 @@ def run(rates: dict, *args, **kwargs):
             val_loader, kwargs['criterion']
         )
         # 实时输出
-        print(f"Epoch {epoch}/{kwargs['epoch']}")
         print(f'Train Loss: {train_loss:.4f} | Train Dice: {train_dice:.4f}')
         print(f'Val   Loss: {val_loss:.4f} | Val   Dice: {val_dice:.4f}')
         # 保存最优模型
