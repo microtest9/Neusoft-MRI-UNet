@@ -21,6 +21,15 @@ def get_loader(dataset, batch_size, shuffle, workers):
         shuffle=shuffle,num_workers=workers
     )
 
+# 日志函数
+def logc(stdop, c='blue'):
+    if c=='blue':
+        print(f'\033[0;37;44m{stdop}\033[0m')
+    elif c=='red':
+        print(f'\033[1;37;41m{stdop}\033[0m')
+    elif c=='info':
+        print(f'\033[4;33;40m{stdop}\033[0m')
+
 # 执行过程
 def run(rates: dict, *args, **kwargs):
     (best_dice,) = args
@@ -38,16 +47,16 @@ def run(rates: dict, *args, **kwargs):
         print(f"Epoch {epoch}/{kwargs['epoch']}")
         print(f'Train Loss: {train_loss:.4f} | Train Dice: {train_dice:.4f}')
         print(f'Val   Loss: {val_loss:.4f} | Val   Dice: {val_dice:.4f}')
-        print('-' * 50)
         # 保存最优模型
         if val_dice > best_dice:
             best_dice = val_dice
             torch.save(kwargs['model'].state_dict(), 'pth_model/best_model.pth')
-            print("Saved best model!")
+            logc("Saved best model!", 'info')
+        logc(f"{'-' * 100}\n")
         # 记录指标
         dict_value_update(rates, [val_dice, train_dice, val_loss, train_loss])
 
-    print(f'Best Dice: {best_dice:.4f}')
+    logc(f'Best Dice: {best_dice:.4f}', 'red')
     # ===== 可视化结果 ===== 
     visualize_results(kwargs['model'], kwargs['device'], val_loader)
     plot_metrics(rates)
