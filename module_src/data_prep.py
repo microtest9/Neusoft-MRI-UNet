@@ -1,7 +1,10 @@
 from PIL import Image
 from torch.utils.data import Dataset
-import numpy as np
-import os, cv2, random, glob, torch
+from glob import glob as iterate
+from random import seed, shuffle
+from numpy import max as npmax
+from os import path, listdir
+from cv2 import imread, IMREAD_GRAYSCALE
 
 # ====================== 1. 数据预处理模块 ======================
 class BrainMRIDataset(Dataset):
@@ -31,10 +34,10 @@ class BrainMRIDataset(Dataset):
         self.mask_paths  = []   # 存储掩码路径 
         
         # 遍历数据目录中的所有子目录（每个子目录代表一个患者）
-        for subdir in glob.glob(os.path.join(data_dir,  '*')):
-            if os.path.isdir(subdir):   # 确保是目录 
+        for subdir in iterate(path.join(data_dir,  '*')):
+            if path.isdir(subdir):   # 确保是目录 
                 # 获取目录下所有文件 
-                files = os.listdir(subdir) 
+                files = listdir(subdir) 
                 
                 # 分离图像文件和掩码文件（掩码文件名包含'mask'）
                 images = [f for f in files if 'mask' not in f]  # 图像文件 
@@ -45,22 +48,22 @@ class BrainMRIDataset(Dataset):
                     # 生成对应的掩码文件名（假设命名规则为：image.tif  和 image_mask.tif ）
                     mask = img.split('.')[0]  + '_mask.tif' 
                     if mask in masks:  # 如果对应的掩码存在 
-                        self.image_paths.append(os.path.join(subdir,  img))
-                        self.mask_paths.append(os.path.join(subdir,  mask))
+                        self.image_paths.append(path.join(subdir,  img))
+                        self.mask_paths.append(path.join(subdir,  mask))
         
         # 过滤掉掩码全为0的无效样本 
         self.valid_indices  = []
         for i, mask_path in enumerate(self.mask_paths): 
             # 使用OpenCV读取掩码（灰度模式）
-            mask = cv2.imread(mask_path,  cv2.IMREAD_GRAYSCALE)
-            if np.max(mask)  > 0:  # 检查掩码是否包含非零值（即有肿瘤区域）
+            mask = imread(mask_path,  IMREAD_GRAYSCALE)
+            if npmax(mask)  > 0:  # 检查掩码是否包含非零值（即有肿瘤区域）
                 self.valid_indices.append(i)   # 只保留有效样本的索引 
         
         # 划分训练集和验证集 
-        random.seed(42)   # 固定随机种子保证可复现性 
+        seed(42)   # 固定随机种子保证可复现性 
         num_samples = len(self.valid_indices) 
         indices = list(range(num_samples))
-        random.shuffle(indices)   # 打乱顺序 
+        shuffle(indices)   # 打乱顺序 
         
         # 按比例划分 
         split = int(train_ratio * num_samples)
