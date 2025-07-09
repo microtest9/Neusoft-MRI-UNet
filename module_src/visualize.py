@@ -6,7 +6,7 @@ import numpy as np
 def plot_metrics(rates: dict):
     """绘制 Loss 和 Dice 曲线图"""
     train_losses, val_losses, train_dices, val_dices = [rates[key] for key in rates.keys()]
-    plt.figure(figsize=(9, 5))
+    plt.figure(figsize=(9, 4))
     plt.gcf().canvas.toolbar_visible=True
 
     plt.subplot(1, 2, 1)
@@ -51,7 +51,7 @@ def visualize_results(model, device, val_loader, num_samples=3):
         print(f"预测形状: {preds.shape}")
         
         # 可视化 
-        plt.figure(figsize=(9,  5*num_samples))
+        plt.figure(figsize=(9,  2*num_samples))
         plt.gcf().canvas.toolbar_visible=True
         for i in range(num_samples):
             # 原始图像 [H,W,C]
