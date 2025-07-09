@@ -1,0 +1,6 @@
+opencv-python==4.11.0.86
+opencv-python-headless==4.11.0.86
+opencv-contrib-python==4.11.0.86
+#matplotlib==3.10.3
+ipython-autotime==0.3.2
+ipympl==0.9.7
