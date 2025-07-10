@@ -35,8 +35,13 @@ def validate(model, device, val_loader, criterion):
     val_loss = 0.0 
     val_dice = 0.0 
     
+    pbar = progress(
+        val_loader, desc='Validating',
+        bar_format="{desc}: \t{percentage:.1f}%|{bar}{r_bar}"
+    )
+
     with no_grad():   # 禁用梯度计算 
-        for images, masks in progress(val_loader, desc='Validating'):
+        for images, masks in pbar:
             images = images.to(device) 
             masks = masks.to(device).unsqueeze(1)   # 添加通道维度 
             
